@@ -66,13 +66,16 @@ export function IntroScreen({ onComplete }: Props) {
   }, [onComplete]);
 
   return (
-    <div className="relative pt-[90px] text-center" style={{ minHeight: 460 }}>
+    <div className="relative pt-[70px] text-center" style={{ minHeight: 460 }}>
+      {/* + INTRODUCING + ornament mirrors the Special Deals overlay header */}
       <div
         ref={line1Ref}
-        className="mb-4 text-sm text-text-light"
+        className="mb-5 flex items-center justify-center gap-2 text-[12px] font-bold uppercase tracking-[3px] text-text-light"
         style={{ opacity: 0, transition: "opacity 0.4s" }}
       >
-        zepto delivers in
+        <span className="text-zepto-magenta">+</span>
+        <span>zepto delivers in</span>
+        <span className="text-zepto-magenta">+</span>
       </div>
       {/* "10 minutes" in yellow mirrors the brief's provocation page treatment */}
       <div
@@ -84,7 +87,7 @@ export function IntroScreen({ onComplete }: Props) {
       </div>
       <div
         ref={line3Ref}
-        className="mb-2 text-sm text-text-light"
+        className="mb-2 text-[12px] font-bold uppercase tracking-[3px] text-text-light"
         style={{ opacity: 0, transition: "opacity 0.4s" }}
       >
         save your magnum in
@@ -98,10 +101,10 @@ export function IntroScreen({ onComplete }: Props) {
       </div>
       <div
         ref={taglineRef}
-        className="text-base italic text-white"
+        className="text-[15px] italic text-white"
         style={{ opacity: 0, transition: "opacity 0.4s" }}
       >
-        catch the cold · don&rsquo;t let go
+        catch the cold <span className="text-accent-yellow">·</span> don&rsquo;t let go
       </div>
       <div
         ref={countdownRef}
