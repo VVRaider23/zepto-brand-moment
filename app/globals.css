@@ -1,11 +1,23 @@
 @import "tailwindcss";
 
+/*
+ * Brand tokens extracted from real Zepto app screenshots (May 2026).
+ * See Screenshots/ for the source captures.
+ *
+ * Anchors:
+ *  - Deep purple #3d1c71 = app icon base + promo overlays ("INTRODUCING SPECIAL DEALS")
+ *  - Magenta #ec4080    = primary CTAs (Use App, Click to Pay)
+ *  - Z orange #f26057   = the literal "z" letter in their app icon
+ *  - Yellow #ffd60a     = sale price callouts
+ *  - Green #22c55e      = savings badges ("Yay! You saved ₹154")
+ */
 @theme {
-  --color-zepto-magenta: #e83a6e;
-  --color-zepto-purple: #1a0033;
+  --color-zepto-magenta: #ec4080;
+  --color-zepto-purple: #3d1c71;
   --color-zepto-purple-mid: #2d1454;
-  --color-zepto-purple-deep: #0d001f;
-  --color-zepto-purple-edge: #0a0015;
+  --color-zepto-purple-deep: #1e0b3e;
+  --color-zepto-purple-edge: #0f0420;
+  --color-zepto-orange: #f26057;
 
   --color-text-primary: #ffffff;
   --color-text-light: #c4b5fd;
@@ -13,6 +25,9 @@
 
   --color-frost: #7dd3fc;
   --color-frost-light: #bae6fd;
+
+  --color-accent-yellow: #ffd60a;
+  --color-accent-green: #22c55e;
 
   --color-warn-amber: #fbbf24;
   --color-warn-orange: #f59e0b;

@@ -17,12 +17,17 @@ export const GAME = {
   PARTICLE_MAX: 60,
 } as const;
 
+// Mirrors --color-* tokens in globals.css. Used by GameScreen for direct
+// SVG attribute mutation in the rAF loop (where Tailwind classes can't reach).
 export const COLOR = {
-  MAGENTA: "#e83a6e",
+  MAGENTA: "#ec4080",
+  ORANGE: "#f26057",
   FROST: "#7dd3fc",
   FROST_LIGHT: "#bae6fd",
-  PURPLE_DEEP: "#0d001f",
+  PURPLE_DEEP: "#1e0b3e",
   PURPLE_MID: "#2d1454",
+  YELLOW: "#ffd60a",
+  GREEN: "#22c55e",
   AMBER: "#f59e0b",
   RED: "#dc2626",
   DANGER: "#f87171",

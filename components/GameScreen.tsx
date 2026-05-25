@@ -79,7 +79,7 @@ export function GameScreen({ onComplete }: Props) {
     function renderParticles() {
       let html = "";
       for (const p of particles) {
-        const color = p.onTarget ? COLOR.FROST : COLOR.MAGENTA;
+        const color = p.onTarget ? COLOR.FROST : COLOR.ORANGE;
         html +=
           '<circle cx="' +
           p.x.toFixed(1) +
@@ -204,8 +204,8 @@ export function GameScreen({ onComplete }: Props) {
           GAME.OFF_TARGET_MELT_BASE +
           Math.min(GAME.OFF_TARGET_MELT_RAMP, t * GAME.OFF_TARGET_MELT_RAMP);
         currentPct = Math.max(0, currentPct - meltRate);
-        cursorZRef.current?.setAttribute("fill", COLOR.MAGENTA);
-        cursorGlowRef.current?.setAttribute("fill", COLOR.MAGENTA);
+        cursorZRef.current?.setAttribute("fill", COLOR.ORANGE);
+        cursorGlowRef.current?.setAttribute("fill", COLOR.ORANGE);
         cursorTargetSize =
           GAME.CURSOR_BASE_SIZE *
           (finger.active ? GAME.CURSOR_GROW_OFF_TARGET : 1.0);
@@ -391,8 +391,8 @@ export function GameScreen({ onComplete }: Props) {
             <circle
               ref={cursorGlowRef}
               r={22}
-              fill={COLOR.MAGENTA}
-              opacity={0.18}
+              fill={COLOR.ORANGE}
+              opacity={0.22}
             />
             <text
               ref={cursorZRef}
@@ -401,9 +401,9 @@ export function GameScreen({ onComplete }: Props) {
               textAnchor="middle"
               dominantBaseline="central"
               fontFamily="system-ui,-apple-system,sans-serif"
-              fontWeight={700}
+              fontWeight={800}
               fontSize={GAME.CURSOR_BASE_SIZE}
-              fill={COLOR.MAGENTA}
+              fill={COLOR.ORANGE}
               filter="url(#frostGlow)"
             >
               Z

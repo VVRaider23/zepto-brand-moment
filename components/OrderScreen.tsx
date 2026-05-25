@@ -8,7 +8,8 @@ export function OrderScreen({ onPlaceOrder }: Props) {
       <div className="mb-1.5 text-[13px] text-text-light">your cart</div>
 
       <div className="mb-3 flex items-center gap-3 rounded-row bg-zepto-purple-mid p-[14px]">
-        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-zepto-magenta text-2xl">
+        {/* product tile uses Zepto orange to mirror their app icon "z" color */}
+        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-zepto-orange text-2xl">
           {"\u{1F366}"}
         </div>
         <div className="flex-1">
@@ -18,9 +19,14 @@ export function OrderScreen({ onPlaceOrder }: Props) {
         <div className="text-sm font-medium">{"\u20B9"}120</div>
       </div>
 
-      <div className="mb-4 flex justify-between rounded-row bg-zepto-purple-mid p-[14px] text-[13px]">
+      <div className="mb-2 flex items-center justify-between rounded-row bg-zepto-purple-mid p-[14px] text-[13px]">
         <div>delivery in</div>
         <div className="font-medium text-zepto-magenta">10 min</div>
+      </div>
+
+      {/* green savings strip — mirrors Zepto's "Yay! You saved" banner */}
+      <div className="mb-4 flex items-center justify-center gap-1.5 rounded-row bg-accent-green/15 px-3 py-2 text-[11px] text-accent-green">
+        <span className="font-medium">save up to 50% if you catch it at peak</span>
       </div>
 
       <button
