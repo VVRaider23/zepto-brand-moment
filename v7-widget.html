@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Catch It At Peak — v7 Reference Prototype</title>
+<style>
+  body { margin: 0; padding: 20px; background: #0a0015; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  #phone-frame { background: #1a0033; border-radius: 24px; padding: 20px 16px; min-height: 640px; color: #fff; position: relative; overflow: hidden; max-width: 380px; width: 100%; }
+</style>
+</head>
+<body>
+
+<!--
+  ================================================================================
+  CATCH IT AT PEAK — v7 REFERENCE PROTOTYPE
+  ================================================================================
+  This is the canonical reference for the game mechanic, timings, physics, and
+  visual treatment. Port this logic to React components when building in Next.js.
+
+  KEY PARAMETERS (do not change without explicit reason):
+  - DURATION_MS: 15000
+  - COLD_RADIUS: 34
+  - CURSOR_BASE_SIZE: 28
+  - ON_TARGET_FREEZE_GAIN: 0.20 per frame
+  - OFF_TARGET_MELT: 0.18 base + up to 0.62 ramp by end
+  - TARGET_INTERVAL: 1700ms start, ramping down to 450ms
+  - EASE_SPEED: 0.026 base + 0.038 ramp
+  - CURSOR_SHRINK_ON_TARGET: 0.88 multiplier
+  - CURSOR_GROW_OFF_TARGET: 1.18 multiplier
+
+  COLORS (Zepto brand):
+  - Zepto magenta: #e83a6e (cursor, CTAs, accents)
+  - Deep purple bg: #1a0033
+  - Mid purple: #2d1454
+  - Light purple text: #c4b5fd / #9d7fc7
+  - Frost blue (on-target): #7dd3fc / #bae6fd
+  - Yellow accent (kept for meter highlights): #fbbf24
+  ================================================================================
+-->
+
+<div id="phone-frame">
+
+  <!-- Status bar -->
+  <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#c4b5fd;margin-bottom:12px;">
+    <span>11:08 PM</span>
+    <span style="display:flex;gap:4px;align-items:center;">5G 100%</span>
+  </div>
+
+  <!-- ============ SCREEN 1: ORDER ============ -->
+  <div id="screen-order" style="display:block;">
+    <div style="font-size:13px;color:#c4b5fd;margin-bottom:6px;">your cart</div>
+    <div style="background:#2d1454;border-radius:12px;padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;">
+      <div style="width:48px;height:48px;background:#e83a6e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;">🍦</div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:500;">Magnum almond</div>
+        <div style="font-size:11px;color:#c4b5fd;">single bar · 90g</div>
+      </div>
+      <div style="font-size:14px;font-weight:500;">₹120</div>
+    </div>
+    <div style="background:#2d1454;border-radius:12px;padding:14px;margin-bottom:16px;display:flex;justify-content:space-between;font-size:13px;">
+      <div>delivery in</div>
+      <div style="color:#e83a6e;font-weight:500;">10 min</div>
+    </div>
+    <button id="btn-order" style="width:100%;background:#e83a6e;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:500;cursor:pointer;">place order · ₹120</button>
+    <div style="text-align:center;font-size:11px;color:#9d7fc7;margin-top:14px;">↓ tap to start</div>
+  </div>
+
+  <!-- ============ SCREEN 2: INTRO ============ -->
+  <div id="screen-intro" style="display:none;text-align:center;padding-top:90px;">
+    <div id="intro-line-1" style="font-size:14px;color:#c4b5fd;margin-bottom:16px;opacity:0;transition:opacity 0.4s;">zepto delivers in</div>
+    <div id="intro-line-2" style="font-size:48px;font-weight:500;color:#e83a6e;margin-bottom:30px;opacity:0;transition:opacity 0.4s;">10 minutes</div>
+    <div id="intro-line-3" style="font-size:14px;color:#c4b5fd;margin-bottom:8px;opacity:0;transition:opacity 0.4s;">save your magnum in</div>
+    <div id="intro-line-4" style="font-size:48px;font-weight:500;color:#e83a6e;margin-bottom:40px;opacity:0;transition:opacity 0.4s;">15 seconds</div>
+    <div id="intro-tagline" style="font-size:16px;color:#fff;font-style:italic;opacity:0;transition:opacity 0.4s;">catch the cold · don't let go</div>
+    <div id="intro-countdown" style="position:absolute;left:0;right:0;top:200px;font-size:120px;font-weight:500;color:#e83a6e;opacity:0;transition:all 0.3s;">3</div>
+  </div>
+
+  <!-- ============ SCREEN 3: GAME ============ -->
+  <div id="screen-game" style="display:none;text-align:center;">
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#c4b5fd;margin-bottom:8px;">
+      <span>catch it at peak</span>
+      <span id="time-left">15.0s</span>
+    </div>
+    <div style="font-size:14px;font-weight:500;margin-bottom:10px;">keep the frost on the cold spot</div>
+
+    <div style="position:relative;height:8px;background:#2d1454;border-radius:4px;margin:0 0 4px;overflow:hidden;">
+      <div id="meter-fill" style="position:absolute;left:0;top:0;height:100%;width:100%;background:#e83a6e;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:#9d7fc7;margin-bottom:8px;">
+      <span>melting</span>
+      <span id="meter-text">100% frozen</span>
+      <span id="status-text">on target</span>
+    </div>
+
+    <div id="game-canvas-wrap" style="position:relative;width:100%;height:380px;background:#0d001f;border-radius:14px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;">
+      <svg id="game-svg" viewBox="0 0 340 380" style="position:absolute;inset:0;width:100%;height:100%;">
+        <defs>
+          <radialGradient id="coldGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#bae6fd" stop-opacity="0.9"/>
+            <stop offset="60%" stop-color="#7dd3fc" stop-opacity="0.7"/>
+            <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.3"/>
+          </radialGradient>
+          <filter id="frostGlow"><feGaussianBlur stdDeviation="1.5"/></filter>
+        </defs>
+        <!-- Faded Magnum that melts in real-time -->
+        <g id="magnum-bg" opacity="0.22">
+          <rect x="155" y="80" width="14" height="50" fill="#d4a574" rx="2"/>
+          <rect id="bg-magnum-body" x="135" y="125" width="55" height="180" fill="#3a1f0a" rx="6"/>
+        </g>
+        <!-- Particle trail layer -->
+        <g id="particle-layer"></g>
+        <!-- The cold spot (target) -->
+        <circle id="cold-spot" cx="170" cy="190" r="34" fill="url(#coldGrad)"/>
+        <circle id="cold-spot-ring" cx="170" cy="190" r="34" fill="none" stroke="#bae6fd" stroke-width="1.5" opacity="0.8" stroke-dasharray="3 3"/>
+        <!-- The Zepto Z cursor -->
+        <g id="cursor-group" transform="translate(-100,-100)">
+          <circle id="cursor-glow" r="22" fill="#e83a6e" opacity="0.18"/>
+          <text id="cursor-z" x="0" y="0" text-anchor="middle" dominant-baseline="central" font-family="system-ui,-apple-system,sans-serif" font-weight="700" font-size="28" fill="#e83a6e" filter="url(#frostGlow)">Z</text>
+        </g>
+      </svg>
+    </div>
+    <div style="font-size:11px;color:#9d7fc7;margin-top:8px;">drag the frosty Z to follow the cold spot</div>
+  </div>
+
+  <!-- ============ SCREEN 4: RESULT ============ -->
+  <div id="screen-result" style="display:none;text-align:center;">
+    <div style="font-size:11px;color:#c4b5fd;letter-spacing:1px;margin-bottom:4px;">your save</div>
+
+    <!-- THIS IS THE SHARE CARD — capture this element with html2canvas -->
+    <div id="share-card" style="background:#2d1454;border-radius:16px;padding:18px 14px;margin:12px 0;">
+      <div style="position:relative;width:90px;height:130px;margin:0 auto 10px;">
+        <svg id="magnum-frozen" viewBox="0 0 140 200" style="width:100%;height:100%;">
+          <rect x="62" y="10" width="14" height="50" fill="#d4a574" rx="2"/>
+          <rect id="frozen-body" x="35" y="60" width="70" height="120" fill="#3a1f0a" rx="6"/>
+          <g id="frozen-drips"></g>
+        </svg>
+      </div>
+      <div id="result-pct" style="font-size:44px;font-weight:500;color:#e83a6e;line-height:1;">87%</div>
+      <div style="font-size:11px;color:#c4b5fd;margin-top:4px;">frozen at peak</div>
+      <div style="border-top:1px solid #422680;margin:12px 0;"></div>
+      <div style="display:flex;justify-content:space-around;font-size:11px;color:#c4b5fd;">
+        <div><div id="result-disc" style="font-size:17px;color:#fff;font-weight:500;">30% off</div><div>discount</div></div>
+        <div><div id="result-ontime" style="font-size:17px;color:#fff;font-weight:500;">87%</div><div>on target</div></div>
+        <div><div id="result-rank" style="font-size:17px;color:#fff;font-weight:500;">top 24%</div><div>mumbai</div></div>
+      </div>
+    </div>
+
+    <div id="result-tagline" style="font-size:13px;color:#e83a6e;margin-bottom:12px;font-style:italic;">caught it before it melted</div>
+
+    <button id="btn-share" style="width:100%;background:#e83a6e;color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;">share my save</button>
+    <button id="btn-retry" style="width:100%;background:transparent;color:#e83a6e;border:1px solid #e83a6e;border-radius:12px;padding:11px;font-size:13px;cursor:pointer;">try again</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // =========================================================================
+  // ELEMENT REFS
+  // =========================================================================
+  const screens = {
+    order: document.getElementById('screen-order'),
+    intro: document.getElementById('screen-intro'),
+    game: document.getElementById('screen-game'),
+    result: document.getElementById('screen-result')
+  };
+  const btnOrder = document.getElementById('btn-order');
+  const btnRetry = document.getElementById('btn-retry');
+  const btnShare = document.getElementById('btn-share');
+  const meterFill = document.getElementById('meter-fill');
+  const meterText = document.getElementById('meter-text');
+  const statusText = document.getElementById('status-text');
+  const timeLeftEl = document.getElementById('time-left');
+  const canvasWrap = document.getElementById('game-canvas-wrap');
+  const coldSpot = document.getElementById('cold-spot');
+  const coldSpotRing = document.getElementById('cold-spot-ring');
+  const cursorGroup = document.getElementById('cursor-group');
+  const cursorZ = document.getElementById('cursor-z');
+  const cursorGlow = document.getElementById('cursor-glow');
+  const particleLayer = document.getElementById('particle-layer');
+  const bgMagnumBody = document.getElementById('bg-magnum-body');
+  const frozenBody = document.getElementById('frozen-body');
+  const frozenDrips = document.getElementById('frozen-drips');
+  const resultPct = document.getElementById('result-pct');
+  const resultDisc = document.getElementById('result-disc');
+  const resultRank = document.getElementById('result-rank');
+  const resultOnTime = document.getElementById('result-ontime');
+  const resultTagline = document.getElementById('result-tagline');
+  const introLines = [1,2,3,4].map(i => document.getElementById('intro-line-'+i))
+    .concat([document.getElementById('intro-tagline')]);
+  const introCountdown = document.getElementById('intro-countdown');
+
+  // =========================================================================
+  // GAME CONSTANTS — these are the tuned values from extensive playtesting
+  // =========================================================================
+  const VIEW_W = 340;
+  const VIEW_H = 380;
+  const COLD_RADIUS = 34;
+  const DURATION = 15000;
+  const CURSOR_BASE_SIZE = 28;
+  const ZEPTO_PINK = '#e83a6e';
+  const FROST_BLUE = '#7dd3fc';
+
+  // Game state
+  let startTime = null;
+  let rafId = null;
+  let currentPct = 100;
+  let coldPos = {x: 170, y: 190};
+  let nextTarget = {x: 170, y: 190};
+  let lastTargetTime = 0;
+  let finger = {x: -100, y: -100, active: false};
+  let onTargetFrames = 0;
+  let totalFrames = 0;
+  let particles = [];
+  let cursorSize = CURSOR_BASE_SIZE;
+  let cursorTargetSize = CURSOR_BASE_SIZE;
+  let particleId = 0;
+
+  // =========================================================================
+  // DISCOUNT TIER TABLE — locked, do not change
+  // =========================================================================
+  function computeResult(saved){
+    if(saved >= 85) return {discount:'50% off', rank:'top 3%', tagline:'legendary save'};
+    if(saved >= 70) return {discount:'40% off', rank:'top 10%', tagline:'caught it just in time'};
+    if(saved >= 50) return {discount:'30% off', rank:'top 22%', tagline:'caught it before it melted'};
+    if(saved >= 30) return {discount:'20% off', rank:'top 45%', tagline:'a little drippy'};
+    if(saved >= 15) return {discount:'10% off', rank:'top 70%', tagline:'mostly melted'};
+    if(saved >= 5)  return {discount:'5% off',  rank:'bottom 20%', tagline:'a puddle, basically'};
+    return {discount:'no discount', rank:'melted', tagline:'you let it melt completely'};
+  }
+
+  // =========================================================================
+  // HELPERS
+  // =========================================================================
+  function show(name){
+    Object.keys(screens).forEach(k => {
+      screens[k].style.display = (k === name ? 'block' : 'none');
+    });
+  }
+
+  function makeDrips(count, height){
+    let drips = '';
+    const positions = [40, 55, 70, 85, 100];
+    for(let i = 0; i < count && i < positions.length; i++){
+      const x = positions[i];
+      const h = 10 + (height * (0.5 + Math.random() * 0.5));
+      drips += '<rect x="' + x + '" y="180" width="4" height="' + h + '" fill="#3a1f0a" rx="2" opacity="0.7"/>';
+    }
+    return drips;
+  }
+
+  function pickNextTarget(){
+    const margin = COLD_RADIUS + 10;
+    nextTarget = {
+      x: margin + Math.random() * (VIEW_W - 2 * margin),
+      y: margin + Math.random() * (VIEW_H - 2 * margin)
+    };
+    lastTargetTime = performance.now();
+  }
+
+  function spawnParticle(x, y, onTarget){
+    particles.push({
+      id: particleId++,
+      x: x + (Math.random() - 0.5) * 6,
+      y: y + (Math.random() - 0.5) * 6,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: 0.3 + Math.random() * 0.6,
+      life: 1.0,
+      size: 2 + Math.random() * 2,
+      onTarget: onTarget
+    });
+    if(particles.length > 60) particles.shift();
+  }
+
+  function renderParticles(){
+    let html = '';
+    for(const p of particles){
+      const color = p.onTarget ? FROST_BLUE : ZEPTO_PINK;
+      html += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) +
+              '" r="' + (p.size * p.life).toFixed(1) +
+              '" fill="' + color + '" opacity="' + (p.life * 0.7).toFixed(2) + '"/>';
+    }
+    particleLayer.innerHTML = html;
+  }
+
+  function updateParticles(){
+    for(const p of particles){
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= 0.025;
+    }
+    particles = particles.filter(p => p.life > 0);
+  }
+
+  function getSvgPoint(clientX, clientY){
+    const rect = canvasWrap.getBoundingClientRect();
+    const x = ((clientX - rect.left) / rect.width) * VIEW_W;
+    const y = ((clientY - rect.top) / rect.height) * VIEW_H;
+    return {x, y};
+  }
+
+  function handlePointerMove(e){
+    if(!startTime) return;
+    let cx, cy;
+    if(e.touches && e.touches[0]){
+      cx = e.touches[0].clientX;
+      cy = e.touches[0].clientY;
+    } else {
+      cx = e.clientX;
+      cy = e.clientY;
+    }
+    const p = getSvgPoint(cx, cy);
+    finger.x = p.x;
+    finger.y = p.y;
+    finger.active = true;
+  }
+
+  function handlePointerDown(e){
+    e.preventDefault();
+    handlePointerMove(e);
+  }
+
+  function handlePointerEnd(){
+    finger.active = false;
+  }
+
+  function updateCursor(){
+    if(!finger.active){
+      cursorGroup.setAttribute('transform', 'translate(-100,-100)');
+      return;
+    }
+    cursorSize += (cursorTargetSize - cursorSize) * 0.18;
+    cursorZ.setAttribute('font-size', cursorSize.toFixed(1));
+    cursorGlow.setAttribute('r', (cursorSize * 0.85).toFixed(1));
+    cursorGroup.setAttribute('transform',
+      'translate(' + finger.x.toFixed(1) + ',' + finger.y.toFixed(1) + ')');
+  }
+
+  // =========================================================================
+  // MAIN GAME LOOP — this is the heart of the mechanic
+  // =========================================================================
+  function tick(){
+    const now = performance.now();
+    const elapsed = now - startTime;
+    const t = elapsed / DURATION;  // 0 to 1 normalized
+
+    // Pick a new target periodically — interval shrinks over time
+    // Start: 1700ms between targets. End: 450ms. Creates rising difficulty.
+    const baseInterval = 1700;
+    const targetInterval = Math.max(450, baseInterval - t * 1250);
+    if(now - lastTargetTime > targetInterval){
+      pickNextTarget();
+    }
+
+    // Ease the cold spot toward the next target
+    // Easing speed ramps up too — faster lerp = sharper chases
+    const easeSpeed = 0.026 + t * 0.038;
+    coldPos.x += (nextTarget.x - coldPos.x) * easeSpeed;
+    coldPos.y += (nextTarget.y - coldPos.y) * easeSpeed;
+    coldSpot.setAttribute('cx', coldPos.x);
+    coldSpot.setAttribute('cy', coldPos.y);
+    coldSpotRing.setAttribute('cx', coldPos.x);
+    coldSpotRing.setAttribute('cy', coldPos.y);
+
+    // Distance check: is finger inside the cold spot?
+    const dx = finger.x - coldPos.x;
+    const dy = finger.y - coldPos.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const onTarget = finger.active && dist < COLD_RADIUS;
+
+    totalFrames++;
+    if(onTarget){
+      onTargetFrames++;
+      // ON-TARGET: freeze meter increases steadily
+      currentPct = Math.min(100, currentPct + 0.20);
+      cursorZ.setAttribute('fill', FROST_BLUE);
+      cursorGlow.setAttribute('fill', FROST_BLUE);
+      cursorTargetSize = CURSOR_BASE_SIZE * 0.88;  // shrink: precise
+      statusText.textContent = 'on target';
+      statusText.style.color = FROST_BLUE;
+    } else {
+      // OFF-TARGET: melt rate ramps up over time. Late game is brutal.
+      const meltRate = 0.18 + Math.min(0.62, t * 0.62);
+      currentPct = Math.max(0, currentPct - meltRate);
+      cursorZ.setAttribute('fill', ZEPTO_PINK);
+      cursorGlow.setAttribute('fill', ZEPTO_PINK);
+      cursorTargetSize = CURSOR_BASE_SIZE * (finger.active ? 1.18 : 1.0);  // grow: panicked
+      statusText.textContent = finger.active ? 'off target' : 'no touch';
+      statusText.style.color = '#f87171';
+    }
+
+    // Spawn frost particles trailing the cursor
+    if(finger.active && Math.random() < 0.85){
+      spawnParticle(finger.x, finger.y, onTarget);
+    }
+
+    updateParticles();
+    renderParticles();
+    updateCursor();
+
+    // Update UI: meter, freeze text, time
+    meterFill.style.width = currentPct + '%';
+    meterFill.style.background = currentPct > 60 ? ZEPTO_PINK : (currentPct > 30 ? '#f59e0b' : '#dc2626');
+    meterText.textContent = Math.round(currentPct) + '% frozen';
+
+    // Background Magnum melts in real-time with the freeze meter
+    const bodyY = 125 + (180 - 180 * currentPct / 100);
+    bgMagnumBody.setAttribute('height', 180 * currentPct / 100);
+    bgMagnumBody.setAttribute('y', bodyY);
+
+    timeLeftEl.textContent = Math.max(0, (DURATION - elapsed) / 1000).toFixed(1) + 's';
+
+    if(elapsed < DURATION){
+      rafId = requestAnimationFrame(tick);
+    } else {
+      endGame();
+    }
+  }
+
+  function endGame(){
+    if(rafId) cancelAnimationFrame(rafId);
+    canvasWrap.removeEventListener('mousemove', handlePointerMove);
+    canvasWrap.removeEventListener('touchmove', handlePointerMove);
+
+    const saved = Math.round(currentPct);
+    const onTimePct = totalFrames > 0 ? Math.round((onTargetFrames / totalFrames) * 100) : 0;
+    const result = computeResult(saved);
+
+    resultPct.textContent = saved + '%';
+    resultDisc.textContent = result.discount;
+    resultRank.textContent = result.rank;
+    resultOnTime.textContent = onTimePct + '%';
+    resultTagline.textContent = result.tagline;
+
+    // Show the frozen Magnum in its exact end state with drips
+    frozenBody.setAttribute('height', 120 * saved / 100);
+    frozenBody.setAttribute('y', 60 + (120 - 120 * saved / 100));
+    const meltAmount = 100 - saved;
+    const dripCount = Math.min(5, Math.floor(meltAmount / 20));
+    frozenDrips.innerHTML = makeDrips(dripCount, meltAmount * 0.4);
+
+    show('result');
+  }
+
+  function startGame(){
+    show('game');
+    currentPct = 100;
+    onTargetFrames = 0;
+    totalFrames = 0;
+    particles = [];
+    particleLayer.innerHTML = '';
+    coldPos = {x: 170, y: 190};
+    nextTarget = {x: 170, y: 190};
+    lastTargetTime = 0;
+    finger = {x: -100, y: -100, active: false};
+    cursorSize = CURSOR_BASE_SIZE;
+    cursorTargetSize = CURSOR_BASE_SIZE;
+    meterFill.style.width = '100%';
+    meterText.textContent = '100% frozen';
+    timeLeftEl.textContent = '15.0s';
+
+    canvasWrap.addEventListener('mousemove', handlePointerMove);
+    canvasWrap.addEventListener('mousedown', handlePointerDown);
+    canvasWrap.addEventListener('mouseup', handlePointerEnd);
+    canvasWrap.addEventListener('mouseleave', handlePointerEnd);
+    canvasWrap.addEventListener('touchmove', handlePointerMove, {passive: false});
+    canvasWrap.addEventListener('touchstart', handlePointerDown, {passive: false});
+    canvasWrap.addEventListener('touchend', handlePointerEnd);
+
+    setTimeout(function(){
+      startTime = performance.now();
+      pickNextTarget();
+      rafId = requestAnimationFrame(tick);
+    }, 200);
+  }
+
+  // =========================================================================
+  // INTRO SEQUENCE — 6-second animated reveal
+  // =========================================================================
+  function runIntro(){
+    show('intro');
+    introLines.forEach(el => { el.style.opacity = '0'; });
+    introCountdown.style.opacity = '0';
+
+    setTimeout(() => { introLines[0].style.opacity = '1'; }, 150);
+    setTimeout(() => { introLines[1].style.opacity = '1'; }, 500);
+    setTimeout(() => { introLines[2].style.opacity = '1'; }, 1700);
+    setTimeout(() => { introLines[3].style.opacity = '1'; }, 2050);
+    setTimeout(() => { introLines[4].style.opacity = '1'; }, 3100);
+    setTimeout(() => {
+      introLines.forEach(el => { el.style.opacity = '0'; });
+    }, 4100);
+    setTimeout(() => {
+      introCountdown.textContent = '3';
+      introCountdown.style.opacity = '1';
+      introCountdown.style.transform = 'scale(1)';
+    }, 4400);
+    setTimeout(() => {
+      introCountdown.textContent = '2';
+      introCountdown.style.transform = 'scale(1.1)';
+    }, 5000);
+    setTimeout(() => {
+      introCountdown.textContent = '1';
+      introCountdown.style.transform = 'scale(1.2)';
+    }, 5600);
+    setTimeout(() => {
+      introCountdown.textContent = 'GO';
+      introCountdown.style.transform = 'scale(1.4)';
+      introCountdown.style.color = FROST_BLUE;
+    }, 6200);
+    setTimeout(() => {
+      introCountdown.style.opacity = '0';
+      startGame();
+    }, 6700);
+  }
+
+  // =========================================================================
+  // EVENT BINDINGS
+  // =========================================================================
+  btnOrder.addEventListener('click', runIntro);
+
+  btnRetry.addEventListener('click', function(){
+    canvasWrap.removeEventListener('mousemove', handlePointerMove);
+    canvasWrap.removeEventListener('mousedown', handlePointerDown);
+    canvasWrap.removeEventListener('mouseup', handlePointerEnd);
+    canvasWrap.removeEventListener('mouseleave', handlePointerEnd);
+    canvasWrap.removeEventListener('touchmove', handlePointerMove);
+    canvasWrap.removeEventListener('touchstart', handlePointerDown);
+    canvasWrap.removeEventListener('touchend', handlePointerEnd);
+    show('order');
+  });
+
+  btnShare.addEventListener('click', function(){
+    // In the real app, this triggers html2canvas to capture #share-card
+    // and either navigator.share() it or download it as PNG
+    alert('Share card capture goes here (use html2canvas on #share-card element).');
+  });
+
+})();
+</script>
+</body>
+</html>
