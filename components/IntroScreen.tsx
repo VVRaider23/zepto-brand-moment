@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { COLOR } from "@/lib/constants";
+import { BrandBackground } from "@/components/BrandBackground";
+import { StatusBar } from "@/components/StatusBar";
 
 type Props = { onComplete: () => void };
 
@@ -66,57 +68,62 @@ export function IntroScreen({ onComplete }: Props) {
   }, [onComplete]);
 
   return (
-    <div className="relative pt-[70px] text-center" style={{ minHeight: 460 }}>
-      {/* + INTRODUCING + ornament mirrors the Special Deals overlay header */}
-      <div
-        ref={line1Ref}
-        className="mb-5 flex items-center justify-center gap-2 text-[12px] font-bold uppercase tracking-[3px] text-text-light"
-        style={{ opacity: 0, transition: "opacity 0.4s" }}
-      >
-        <span className="text-zepto-magenta">+</span>
-        <span>zepto delivers in</span>
-        <span className="text-zepto-magenta">+</span>
-      </div>
-      {/* "10 minutes" in yellow mirrors the brief's provocation page treatment */}
-      <div
-        ref={line2Ref}
-        className="mb-[30px] text-[56px] font-bold leading-none text-accent-yellow"
-        style={{ opacity: 0, transition: "opacity 0.4s" }}
-      >
-        10 minutes
-      </div>
-      <div
-        ref={line3Ref}
-        className="mb-2 text-[12px] font-bold uppercase tracking-[3px] text-text-light"
-        style={{ opacity: 0, transition: "opacity 0.4s" }}
-      >
-        save your magnum in
-      </div>
-      <div
-        ref={line4Ref}
-        className="mb-10 text-[56px] font-bold leading-none text-zepto-magenta"
-        style={{ opacity: 0, transition: "opacity 0.4s" }}
-      >
-        10 seconds
-      </div>
-      <div
-        ref={taglineRef}
-        className="text-[15px] italic text-white"
-        style={{ opacity: 0, transition: "opacity 0.4s" }}
-      >
-        catch the cold <span className="text-accent-yellow">·</span> don&rsquo;t let go
-      </div>
-      <div
-        ref={countdownRef}
-        className="absolute inset-x-0 text-[120px] font-bold text-zepto-magenta"
-        style={{
-          top: 180,
-          opacity: 0,
-          transform: "scale(1)",
-          transition: "all 0.3s",
-        }}
-      >
-        3
+    <div className="relative flex flex-1 flex-col text-text-primary">
+      <BrandBackground />
+      <div className="relative z-10 flex flex-1 flex-col px-4 py-5 text-center">
+        <StatusBar theme="dark" />
+        <div className="relative pt-12">
+          <div
+            ref={line1Ref}
+            className="mb-5 flex items-center justify-center gap-2 text-[12px] font-bold uppercase tracking-[3px] text-text-light"
+            style={{ opacity: 0, transition: "opacity 0.4s" }}
+          >
+            <span className="text-zepto-magenta">+</span>
+            <span>zepto delivers in</span>
+            <span className="text-zepto-magenta">+</span>
+          </div>
+          <div
+            ref={line2Ref}
+            className="mb-[30px] text-[56px] font-bold leading-none text-accent-yellow"
+            style={{ opacity: 0, transition: "opacity 0.4s" }}
+          >
+            10 minutes
+          </div>
+          <div
+            ref={line3Ref}
+            className="mb-2 text-[12px] font-bold uppercase tracking-[3px] text-text-light"
+            style={{ opacity: 0, transition: "opacity 0.4s" }}
+          >
+            save your magnum in
+          </div>
+          <div
+            ref={line4Ref}
+            className="mb-10 text-[56px] font-bold leading-none text-zepto-magenta"
+            style={{ opacity: 0, transition: "opacity 0.4s" }}
+          >
+            10 seconds
+          </div>
+          <div
+            ref={taglineRef}
+            className="text-[15px] italic text-white"
+            style={{ opacity: 0, transition: "opacity 0.4s" }}
+          >
+            catch the cold <span className="text-accent-yellow">·</span>{" "}
+            don&rsquo;t let go
+          </div>
+          <div
+            ref={countdownRef}
+            className="absolute inset-x-0 text-[120px] font-bold text-zepto-magenta"
+            style={{
+              top: 200,
+              opacity: 0,
+              transform: "scale(1)",
+              transition: "all 0.3s",
+            }}
+          >
+            3
+          </div>
+        </div>
       </div>
     </div>
   );

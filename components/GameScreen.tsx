@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { COLOR, GAME } from "@/lib/constants";
+import { BrandBackground } from "@/components/BrandBackground";
+import { StatusBar } from "@/components/StatusBar";
 
 type Props = {
   onComplete: (freezePercent: number, onTargetPercent: number) => void;
@@ -307,8 +309,11 @@ export function GameScreen({ onComplete }: Props) {
   }, [onComplete]);
 
   return (
-    <div className="text-center">
-      <div className="mb-2 flex items-center justify-between text-[11px] uppercase tracking-[1.5px] text-text-light">
+    <div className="relative flex flex-1 flex-col text-text-primary">
+      <BrandBackground />
+      <div className="relative z-10 flex flex-1 flex-col px-4 py-5 text-center">
+        <StatusBar theme="dark" />
+        <div className="mb-2 flex items-center justify-between text-[11px] uppercase tracking-[1.5px] text-text-light">
         <span>
           catch it at{" "}
           <span className="font-bold text-accent-yellow">peak</span>
@@ -393,11 +398,14 @@ export function GameScreen({ onComplete }: Props) {
           />
 
           <g ref={cursorGroupRef} transform="translate(-100,-100)">
+            {/* dark contrast disk — ensures the Z is always legible even
+                when the cursor sits on top of the bright frost spot */}
+            <circle r={18} fill={COLOR.PURPLE_DEEP} opacity={0.55} />
             <circle
               ref={cursorGlowRef}
               r={22}
               fill={COLOR.ORANGE}
-              opacity={0.22}
+              opacity={0.35}
             />
             <text
               ref={cursorZRef}
@@ -406,10 +414,12 @@ export function GameScreen({ onComplete }: Props) {
               textAnchor="middle"
               dominantBaseline="central"
               fontFamily="system-ui,-apple-system,sans-serif"
-              fontWeight={800}
+              fontWeight={900}
               fontSize={GAME.CURSOR_BASE_SIZE}
               fill={COLOR.ORANGE}
-              filter="url(#frostGlow)"
+              stroke={COLOR.PURPLE_DEEP}
+              strokeWidth={3}
+              paintOrder="stroke fill"
             >
               Z
             </text>
@@ -417,8 +427,9 @@ export function GameScreen({ onComplete }: Props) {
         </svg>
       </div>
 
-      <div className="mt-2 text-[11px] text-text-muted">
-        drag the frosty Z to follow the cold spot
+        <div className="mt-2 text-[11px] text-text-muted">
+          drag the frosty Z to follow the cold spot
+        </div>
       </div>
     </div>
   );
