@@ -74,9 +74,10 @@ export function IntroScreen({ onComplete }: Props) {
       >
         zepto delivers in
       </div>
+      {/* "10 minutes" in yellow mirrors the brief's provocation page treatment */}
       <div
         ref={line2Ref}
-        className="mb-[30px] text-[48px] font-medium text-zepto-magenta"
+        className="mb-[30px] text-[56px] font-bold leading-none text-accent-yellow"
         style={{ opacity: 0, transition: "opacity 0.4s" }}
       >
         10 minutes
@@ -90,7 +91,7 @@ export function IntroScreen({ onComplete }: Props) {
       </div>
       <div
         ref={line4Ref}
-        className="mb-10 text-[48px] font-medium text-zepto-magenta"
+        className="mb-10 text-[56px] font-bold leading-none text-zepto-magenta"
         style={{ opacity: 0, transition: "opacity 0.4s" }}
       >
         10 seconds
@@ -104,7 +105,7 @@ export function IntroScreen({ onComplete }: Props) {
       </div>
       <div
         ref={countdownRef}
-        className="absolute inset-x-0 text-[120px] font-medium text-zepto-magenta"
+        className="absolute inset-x-0 text-[120px] font-bold text-zepto-magenta"
         style={{
           top: 180,
           opacity: 0,

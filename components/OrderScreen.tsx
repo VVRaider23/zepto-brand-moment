@@ -19,9 +19,10 @@ export function OrderScreen({ onPlaceOrder }: Props) {
         <div className="text-sm font-medium">{"\u20B9"}120</div>
       </div>
 
+      {/* "10 min" in yellow — same hero treatment the brief gives "ten minutes" */}
       <div className="mb-2 flex items-center justify-between rounded-row bg-zepto-purple-mid p-[14px] text-[13px]">
         <div>delivery in</div>
-        <div className="font-medium text-zepto-magenta">10 min</div>
+        <div className="text-base font-bold text-accent-yellow">10 min</div>
       </div>
 
       {/* green savings strip — mirrors Zepto's "Yay! You saved" banner */}

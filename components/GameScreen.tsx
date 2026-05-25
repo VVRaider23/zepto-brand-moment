@@ -308,9 +308,14 @@ export function GameScreen({ onComplete }: Props) {
 
   return (
     <div className="text-center">
-      <div className="mb-2 flex items-center justify-between text-[11px] text-text-light">
-        <span>catch it at peak</span>
-        <span ref={timeLeftRef}>10.0s</span>
+      <div className="mb-2 flex items-center justify-between text-[11px] uppercase tracking-[1.5px] text-text-light">
+        <span>
+          catch it at{" "}
+          <span className="font-bold text-accent-yellow">peak</span>
+        </span>
+        <span ref={timeLeftRef} className="font-bold text-white normal-case tracking-normal">
+          10.0s
+        </span>
       </div>
       <div className="mb-2.5 text-sm font-medium">
         keep the frost on the cold spot
