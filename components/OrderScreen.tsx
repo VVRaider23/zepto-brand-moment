@@ -126,7 +126,7 @@ export function OrderScreen({ onPlaceOrder }: Props) {
           onClick={onPlaceOrder}
           className="w-full cursor-pointer rounded-row bg-zepto-magenta px-4 py-[15px] text-[15px] font-bold text-white shadow-lg shadow-zepto-magenta/30 transition-transform active:scale-[0.98]"
         >
-          Place Order · {"\u20B9"}120
+          Pay Now · {"\u20B9"}120
         </button>
         <div className="mt-3 text-center text-[11px] text-ink-mute">
           ↓ tap to start the moment
