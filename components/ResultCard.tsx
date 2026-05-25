@@ -71,16 +71,7 @@ export const ResultCard = forwardRef<HTMLDivElement, Props>(function ResultCard(
         {tier.tagline}
       </div>
 
-      {/* echoes the brief's one-line provocation, brief-style color treatment */}
-      <div className="mt-4 border-t border-[#422680] pt-3 text-[11px] leading-tight text-text-light">
-        the brand you scream{" "}
-        <span className="text-accent-yellow font-bold">for</span>.
-        <br />
-        not the brand you scream{" "}
-        <span className="text-text-muted font-bold">into</span>.
-      </div>
-
-      <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] tracking-[1.5px] uppercase">
+      <div className="mt-4 flex items-center justify-center gap-1.5 border-t border-[#422680] pt-3 text-[10px] tracking-[1.5px] uppercase">
         <span className="text-zepto-orange font-extrabold">z</span>
         <span className="text-text-muted">zepto in 10</span>
       </div>
